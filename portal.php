@@ -76,7 +76,7 @@
     	</p>
     	  <div class="col-lg-3"></div>
     	  <div class="form-group col-lg-6">
-		    <label for="YearMonth">記入する就業月</label>
+		    <label for="YearMonth">申請対象の就業月</label>
 		    <input type="text" class="form-control" id="YearMonth" name="就業月" placeholder="YYYY年MM月" value="<?php echo $yearmonth;?>">
 		  </div>
 		  <div class="col-lg-3"></div>

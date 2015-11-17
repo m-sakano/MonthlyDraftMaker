@@ -38,26 +38,28 @@ function createDatafile($header) {
 	
 	// ヘッダ情報書き込み
 	$objPHPExcel->setActiveSheetIndexByName('ヘッダ情報');
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 1, '会社名');
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 1, $header['会社名']);
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 2, '部署');
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 2, $header['部署']);
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 3, '班');
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 3, $header['班']);
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 4, '役職名');
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 4, $header['役職名']);
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 5, '氏名');
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 5, $header['氏名']);
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 6, '就業先企業名');
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 6, $header['就業先企業名']);
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 7, 'プロジェクト名');
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 7, $header['プロジェクト名']);
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 8, '始業時刻');
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 8, $header['始業時刻']);
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 9, '終業時刻');
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 9, $header['終業時刻']);
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 10, '休憩時間帯');
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 10, $header['休憩時間帯']);
+	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 1, '就業月');
+	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 1, $header['就業月']);
+	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 2, '会社名');
+	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 2, $header['会社名']);
+	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 3, '部署');
+	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 3, $header['部署']);
+	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 4, '班');
+	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 4, $header['班']);
+	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 5, '役職名');
+	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 5, $header['役職名']);
+	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 6, '氏名');
+	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 6, $header['氏名']);
+	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 7, '就業先企業名');
+	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 7, $header['就業先企業名']);
+	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 8, 'プロジェクト名');
+	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 8, $header['プロジェクト名']);
+	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 9, '始業時刻');
+	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 9, $header['始業時刻']);
+	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 10, '終業時刻');
+	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 10, $header['終業時刻']);
+	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 11, '休憩時間帯');
+	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 11, $header['休憩時間帯']);
 	
 	// 案件先勤務時間書き込み
 	$objPHPExcel->setActiveSheetIndexByName('案件先勤務時間');

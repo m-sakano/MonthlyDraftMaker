@@ -5,7 +5,6 @@ require_once('saveConfig.php');
 require_once('createDatafile.php');
 require_once('createZipArchive.php');
 require_once('downloadFile.php');
-require_once('removeTemporaryFiles.php');
 session_start();
 
 // 未ログインのアクセスはホーム画面へ飛ばす
@@ -25,9 +24,3 @@ createZipArchive();
 // ファイルをブラウザからダウンロード
 $filepath = __DIR__.'/tmp/'.$_SESSION['email'].'/'.BRAND.'.zip';
 downloadFile($filepath);
-
-// 一時ファイルを削除
-removeTemporaryFiles();
-
-// ページをリダイレクトして戻る
-header('Location: '.SITE_URL);
