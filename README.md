@@ -7,7 +7,3 @@ PHPでExcelを扱えるライブラリがほかに見当たらないのでPython
 
 サーバ側で編集するのは困難であるため、クライアント側でマクロ処理する。
 
-月末申請書ドラフト_氏名_YYYYMM.zip
-/MonthlyDraftMaker.xlsm
-/etc/月末申請書_(課)_(氏名)_(yyyyMM).xlsx
-/etc/data.xlsx
