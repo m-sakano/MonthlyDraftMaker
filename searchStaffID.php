@@ -55,23 +55,33 @@ function searchStaffID() {
 	$fname = dirname(__FILE__)."/tmp/"."$hash".".xlsx";	// ファイル名を設定
 	$fp = fopen("$fname", "w+");						// ファイルをr+wで作成
 
-	// AccessTokenの有効期限が切れていたら再取得する
-	if ($_SESSION['accesstokenexpire'] < time()) {
-		refreshAccessToken();
-	}
+	// AccessTokenをリフレッシュする
+	//refreshAccessToken();
 
 	// cURLの処理
 	$ch = curl_init();							// cURLの初期化
-	$header = array('Authorization: Bearer '.$_SESSION['accesstoken']);	/// "Authorization": "Bearer <access_token>"
+	$header = array('Authorization: Bearer '.$_SESSION['access_token']);	/// "Authorization": "Bearer <access_token>"
 	curl_setopt($ch, CURLOPT_URL, SHEET_URL);	// cURLのURL設定
 	curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
 	curl_setopt($ch, CURLOPT_FILE, $fp);		// cURLの出力先ファイル。指定しないとブラウザに表示される。
 	curl_setopt($ch, CURLOPT_HEADER, 0);		// 0:HTTPヘッダを含めない
 	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);	// 1: LOCATIONを追う
 	curl_exec($ch);								// cURLでHTTP GETを実行
-	curl_close($ch);							// cURLを終了
 	fclose($fp);								// ファイルを閉じる
-	
+	if (curl_getinfo($ch, CURLINFO_HTTP_CODE) == '401') {	// 401 Unauthorized の場合はTokenをRefresh
+		refreshAccessToken();
+		$fp = fopen($fname, 'w+');
+		$header = array('Authorization: Bearer '.$_SESSION['access_token']);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+		curl_exec($ch);
+		fclose($fp);
+		if (curl_getinfo($ch, CURLINFO_HTTP_CODE) == '401') {	// TokenをRefresh後も401の場合は強制ログアウト
+			curl_close($ch);
+			header('Location: '.SITE_URL.'logout.php');
+		}
+	}
+	curl_close($ch);							// cURLを終了
+
 	// xlsxの処理
 	require_once dirname(__FILE__) . '/PHPExcel/Classes/PHPExcel/IOFactory.php';
 	try {

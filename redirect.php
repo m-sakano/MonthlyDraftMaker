@@ -107,9 +107,8 @@ if (!isset($_GET['code'])) {
     $_SESSION['given_name'] = $me->given_name;
     $_SESSION['family_name'] = $me->family_name;
     $_SESSION['picture'] = $me->picture;
-    $_SESSION['accesstoken'] = $json->access_token;
-    $_SESSION['refreshtoken'] = $json->refresh_token;
-    $_SESSION['accesstokenexpire'] = time() + 3600;
+    $_SESSION['access_token'] = $json->access_token;
+    $_SESSION['refresh_token'] = $json->refresh_token;
     
     // 不正ドメイン対策
     $emailaddress = explode('@',$me->email);

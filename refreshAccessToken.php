@@ -8,8 +8,7 @@ function refreshAccessToken() {
 	$params = array(
         'client_id' => CLIENT_ID,
         'client_secret' => CLIENT_SECRET,
-        'redirect_uri' => SITE_URL.'redirect.php',
-        'refresh_token' => $_SESSION['refreshtoken'],
+        'refresh_token' => $_SESSION['refresh_token'],
         'grant_type' => 'refresh_token'
     );
     $url = 'https://accounts.google.com/o/oauth2/token';
@@ -25,7 +24,6 @@ function refreshAccessToken() {
     curl_close($curl);
     $json = json_decode($rs);
     
-    $_SESSION['accesstoken'] = $json->access_token;
-    $_SESSION['refreshtoken'] = $json->refresh_token;
-    $_SESSION['accesstokenexpire'] = time() + 3600;
+    $_SESSION['access_token'] = $json->access_token;
+    $_SESSION['refresh_token'] = $json->refresh_token;
 }
