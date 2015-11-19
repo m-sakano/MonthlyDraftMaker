@@ -6,14 +6,14 @@ require_once('createDynamoDBClient.php');
 require_once(__DIR__ . '/PHPExcel/Classes/PHPExcel/IOFactory.php');
 session_start();
 
-function createDatafile($header) {
+function createDatafile($config) {
 	$userDirectory = __DIR__.'/tmp/'.$_SESSION['email'].'/';
 	if (!file_exists($userDirectory)) {
 		mkdir($userDirectory, 0777, true);
 	}
 	
 	// 就業月変換 'YYYY年MM月' -> 月初めのUnixTime
-	$thisMonthUnixTime = strtotime(str_replace(array('年', '月'), '-', $header['就業月']).'01');
+	$thisMonthUnixTime = strtotime(str_replace(array('年', '月'), '-', $config['就業月']).'01');
 	$nextMonthUnixTime = strtotime('+1 Month ' . date('Y-m-d', $thisMonthUnixTime));
 	
 	// 就業月のWorkTimeをDynamoDBから取得
@@ -24,8 +24,8 @@ function createDatafile($header) {
 	$objPHPExcel = new PHPExcel();
 	
 	// ヘッダ情報シート作成
-	$headerWorkSheet = new PHPExcel_Worksheet($objPHPExcel, 'ヘッダ情報');
-	$objPHPExcel->addSheet($headerWorkSheet, 0);
+	$configWorkSheet = new PHPExcel_Worksheet($objPHPExcel, '設定');
+	$objPHPExcel->addSheet($configWorkSheet, 0);
 	// 案件先勤務時間シート作成
 	$PjWorktimeWorkSheet = new PHPExcel_Worksheet($objPHPExcel, '案件先勤務時間');
 	$objPHPExcel->addSheet($PjWorktimeWorkSheet, 1);
@@ -36,31 +36,15 @@ function createDatafile($header) {
 	$sheetIndex = $objPHPExcel->getIndex($objPHPExcel-> getSheetByName('Worksheet'));
 	$objPHPExcel->removeSheetByIndex($sheetIndex);
 	
-	// ヘッダ情報書き込み
-	$objPHPExcel->setActiveSheetIndexByName('ヘッダ情報');
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 1, '就業月');
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 1, $header['就業月']);
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 2, '会社名');
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 2, $header['会社名']);
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 3, '部署');
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 3, $header['部署']);
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 4, '班');
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 4, $header['班']);
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 5, '役職名');
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 5, $header['役職名']);
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 6, '氏名');
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 6, $header['氏名']);
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 7, '就業先企業名');
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 7, $header['就業先企業名']);
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 8, 'プロジェクト名');
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 8, $header['プロジェクト名']);
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 9, '始業時刻');
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 9, $header['始業時刻']);
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 10, '終業時刻');
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 10, $header['終業時刻']);
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 11, '休憩時間帯');
-	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 11, $header['休憩時間帯']);
-	
+	// 設定書き込み
+	$objPHPExcel->setActiveSheetIndexByName('設定');
+	$i = 0;
+	foreach ($config as $key => $value) {
+		$i++;
+		$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, $i, $key);
+		$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, $i, $value);
+	}
+
 	// 案件先勤務時間書き込み
 	$objPHPExcel->setActiveSheetIndexByName('案件先勤務時間');
 	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 1, '日付');
@@ -70,7 +54,7 @@ function createDatafile($header) {
 	for ($row = 2 , $date = $thisMonthUnixTime; $date < $nextMonthUnixTime; $row++, $date += 60*60*24) {
 		$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, $row, date('Y/m/d',$date));
 	}
-	
+
 	foreach ($worktimes as $worktime) {
 		switch ($worktime['Attendance']['S']) {
 			case '案件先出社':
@@ -79,7 +63,7 @@ function createDatafile($header) {
 				break;
 			case '案件先退社':
 				// 始業時刻を0時を起点にした分に変換
-				$startHourMinites = split(':',$header['始業時刻']);
+				$startHourMinites = split(':',$config['始業時刻']);
 				$startMinites = (int)$startHourMinites[0] * 60 + (int)$startHourMinites[1];
 				// 退社時刻を0時を起点にした分に変換
 				$endMinites = (int)date('H',$worktime['UnixTime']['N']) * 60 + (int)date('i',$worktime['UnixTime']['N']);
@@ -118,7 +102,7 @@ function createDatafile($header) {
 				break;
 			case '自社退社':
 				// 始業時刻を0時を起点にした分に変換
-				$startHourMinites = split(':',$header['始業時刻']);
+				$startHourMinites = split(':',$config['始業時刻']);
 				$startMinites = (int)$startHourMinites[0] * 60 + (int)$startHourMinites[1];
 				// 退社時刻を0時を起点にした分に変換
 				$endMinites = (int)date('H',$worktime['UnixTime']['N']) * 60 + (int)date('i',$worktime['UnixTime']['N']);
@@ -138,7 +122,7 @@ function createDatafile($header) {
 	}
 	
 	// ファイル保存
-	$objPHPExcel->setActiveSheetIndexByName('ヘッダ情報');
+	$objPHPExcel->setActiveSheetIndexByName('設定');
 	$objWriter = new PHPExcel_Writer_Excel2007($objPHPExcel);
 	$objWriter->save($userDirectory.EXCEL_DATA_FILE_NAME);
 }
