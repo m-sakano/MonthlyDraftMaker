@@ -1,7 +1,6 @@
 <?php
 
 require_once('config.php');
-session_start();
 
 function createZipArchive() {
 	$userdir = __DIR__.'/tmp/'.$_SESSION['email'].'/';

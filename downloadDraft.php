@@ -5,7 +5,6 @@ require_once('saveConfig.php');
 require_once('createDatafile.php');
 require_once('createZipArchive.php');
 require_once('downloadFile.php');
-session_start();
 
 // 未ログインのアクセスはホーム画面へ飛ばす
 if (is_null($_SESSION['me'])) {

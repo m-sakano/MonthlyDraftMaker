@@ -3,8 +3,10 @@
 require_once('config.php');
 require_once('getWorkTimeItem.php');
 require_once('createDynamoDBClient.php');
+require_once('strtomin.php');
+require_once('mintostr.php');
+require_once('correctWorkTime.php');
 require_once(__DIR__ . '/PHPExcel/Classes/PHPExcel/IOFactory.php');
-session_start();
 
 function createDatafile($config) {
 	$userDirectory = __DIR__.'/tmp/'.$_SESSION['email'].'/';
@@ -19,6 +21,10 @@ function createDatafile($config) {
 	// 就業月のWorkTimeをDynamoDBから取得
 	$client = createDynamoDBClient();
 	$worktimes = getWorkTimeItem($client, $_SESSION['email'], $thisMonthUnixTime, $nextMonthUnixTime);
+
+	// 休憩時間計算、定時前退社を前日深夜作業に補正、2回出社の日の補正
+	$correctedWorkTimes = correctWorkTime($worktimes, $config);
+	//var_dump($correctedWorkTimes);exit;
 	
 	// ワークブックオブジェクト新規作成
 	$objPHPExcel = new PHPExcel();
@@ -50,36 +56,26 @@ function createDatafile($config) {
 	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 1, '日付');
 	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 1, '案件先出社');
 	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(2, 1, '案件先退社');
+	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(3, 1, '案件先休憩時間');
 	
 	for ($row = 2 , $date = $thisMonthUnixTime; $date < $nextMonthUnixTime; $row++, $date += 60*60*24) {
 		$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, $row, date('Y/m/d',$date));
 	}
 
-	foreach ($worktimes as $worktime) {
-		switch ($worktime['Attendance']['S']) {
+	foreach ($correctedWorkTimes as $key => $val) {
+		switch ($val['attendance']) {
 			case '案件先出社':
-				$row = (int)date('d',$worktime['UnixTime']['N']) + 1;
-				$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, $row, date('H:i',$worktime['UnixTime']['N']));
+				$row = (int)$val['date'] + 1;
+				$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, $row, $val['time']);
 				break;
 			case '案件先退社':
-				// 始業時刻を0時を起点にした分に変換
-				$startHourMinites = split(':',$config['始業時刻']);
-				$startMinites = (int)$startHourMinites[0] * 60 + (int)$startHourMinites[1];
-				// 退社時刻を0時を起点にした分に変換
-				$endMinites = (int)date('H',$worktime['UnixTime']['N']) * 60 + (int)date('i',$worktime['UnixTime']['N']);
-				// 退社時刻(H:i)が始業時刻(H:i)以前の場合、前日の深夜残業
-				if ($startMinites < $endMinites) {
-					// 通常勤務
-					$row = (int)date('d',$worktime['UnixTime']['N']) + 1;
-					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(2, $row, date('H:i',$worktime['UnixTime']['N']));
-				} else {
-					// 前日の深夜残業
-					$row = (int)date('d',$worktime['UnixTime']['N']);
-					$hour = (int)date('H',$worktime['UnixTime']['N']) + 24;
-					$value = (string)$hour . ':' . (string)date('i',$worktime['UnixTime']['N']);
-					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(2, $row, $value);
-				}
+				$row = (int)$val['date'] + 1;
+				$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(2, $row, $val['time']);
 				break;
+			case '案件先休憩時間':
+				$row = (int)$val['date'] + 1;
+				$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(3, $row, $val['time']);
+				$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(4, $row, $val['description']);
 			default:
 		}
 	}
@@ -89,38 +85,29 @@ function createDatafile($config) {
 	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 1, '日付');
 	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 1, '自社出社');
 	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(2, 1, '自社退社');
+	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(3, 1, '自社休憩時間');
 	
 	for ($row = 2 , $date = $thisMonthUnixTime; $date < $nextMonthUnixTime; $row++, $date += 60*60*24) {
 		$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, $row, date('Y/m/d',$date));
 	}
 	
-	foreach ($worktimes as $worktime) {
-		switch ($worktime['Attendance']['S']) {
+	foreach ($correctedWorkTimes as $key => $val) {
+		switch ($val['attendance']) {
 			case '自社出社':
-				$row = (int)date('d',$worktime['UnixTime']['N']) + 1;
-				$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, $row, date('H:i',$worktime['UnixTime']['N']));
+				$row = (int)$val['date'] + 1;
+				$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, $row, $val['time']);
 				break;
 			case '自社退社':
-				// 始業時刻を0時を起点にした分に変換
-				$startHourMinites = split(':',$config['始業時刻']);
-				$startMinites = (int)$startHourMinites[0] * 60 + (int)$startHourMinites[1];
-				// 退社時刻を0時を起点にした分に変換
-				$endMinites = (int)date('H',$worktime['UnixTime']['N']) * 60 + (int)date('i',$worktime['UnixTime']['N']);
-				// 退社時刻(H:i)が始業時刻(H:i)よりも前の場合、前日の深夜残業
-				if ($startMinites < $endMinites) {
-					$row = (int)date('d',$worktime['UnixTime']['N']) + 1;
-					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(2, $row, date('H:i',$worktime['UnixTime']['N']));
-				} else {
-					$row = (int)date('d',$worktime['UnixTime']['N']);
-					$hour = (int)date('H',$worktime['UnixTime']['N']) + 24;
-					$value = (string)$hour . ':' . (string)date('i',$worktime['UnixTime']['N']);
-					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(2, $row, $value);
-				}
+				$row = (int)$val['date'] + 1;
+				$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(2, $row, $val['time']);
 				break;
+			case '自社休憩時間':
+				$row = (int)$val['date'] + 1;
+				$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(3, $row, $val['time']);
+				$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(4, $row, $val['description']);
 			default:
 		}
 	}
-	
 	// ファイル保存
 	$objPHPExcel->setActiveSheetIndexByName('設定');
 	$objWriter = new PHPExcel_Writer_Excel2007($objPHPExcel);

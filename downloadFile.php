@@ -1,7 +1,6 @@
 <?php
 
 require_once('config.php');
-session_start();
 
 function downloadFile($filepath) {
     header('Content-Disposition: inline; filename="'.basename($filepath).'"');
