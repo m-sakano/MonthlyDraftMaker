@@ -16,7 +16,8 @@ function getConfigItem($client,$email) {
 		    )
 		));
 	} catch (exception $e) {
-		echo 'DynamoDBアイテム取得の例外：', $e->getMessage(), "\n";
+		echo 'DynamoDBアイテム取得の例外：', $e->getMessage(), "<br>";
+		echo '再ログインしてリトライしてください';
 		exit;
 	}
 	return $result;

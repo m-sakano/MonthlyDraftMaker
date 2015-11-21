@@ -2,7 +2,6 @@
 
 require_once('config.php');
 require_once('createDynamoDBClient.php');
-require_once('getConfigItem.php');
 require_once('saveConfigItem.php');
 session_start();
 

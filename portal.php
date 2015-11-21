@@ -8,6 +8,7 @@
 	// 未ログインのアクセスはホーム画面へ飛ばす
 	if (is_null($_SESSION['me'])) {
 		header('Location: '.SITE_URL);
+		exit;
 	}
 	
 	// 記入する就業月の計算

@@ -13,7 +13,8 @@ function createDynamoDBClient() {
 		    'region'  => DynamoDB_REGION
 		));
 	} catch (exception $e) {
-		echo 'DynamoDB接続の例外：', $e->getMessage(), "\n";
+		echo 'DynamoDB接続の例外：', $e->getMessage(), "<br>";
+		echo '再ログインしてリトライしてください';
 		exit;
 	}
 	return $client;

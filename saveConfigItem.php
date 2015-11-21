@@ -15,7 +15,8 @@ function saveConfigItem($client,$email,$config) {
 		    'Item' => $item
 		));
 	} catch (exception $e) {
-		echo 'DynamoDB登録の例外：', $e->getMessage(), "\n";
+		echo 'DynamoDB登録の例外：', $e->getMessage(), "<br>";
+		echo '再ログインしてリトライしてください';
 		exit;
 	}
 }

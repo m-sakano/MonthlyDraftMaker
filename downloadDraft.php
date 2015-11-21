@@ -9,6 +9,7 @@ require_once('downloadFile.php');
 // 未ログインのアクセスはホーム画面へ飛ばす
 if (is_null($_SESSION['me'])) {
 	header('Location: '.SITE_URL);
+	exit;
 }
 
 // ConfigをDynamoDBに保存
