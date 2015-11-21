@@ -88,6 +88,7 @@
 
 	    <h2><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> 設定</h2>
 	    <h3>社員情報</h3>
+	    <span id="helpBlock" class="help-block">この項目は社員一覧から引用されます</span>
 		<div class="row">
 		<div class="col-sm-4">
 		  <div class="form-group">
@@ -169,7 +170,7 @@
 		</div>
 		</div>
 		<h3>案件先（２）</h3>
-		<p class="lead">月途中で案件先が変わったときに記入します</p>
+		<span id="helpBlock" class="help-block">月の途中で案件が変更になった場合に、2つめの案件を記入します</span>
 		<div class="row">
 		<div class="col-sm-4">
 		  <div class="form-group">
@@ -191,6 +192,7 @@
 		</div>
 		</div>
 		<h3>勤務報告書（社内）</h3>
+		<span id="helpBlock" class="help-block">休職者以外の生産部社員は、みなし労働時間に5時間（5:00）を記入します</span>
 		<div class="row">
 		<div class="col-sm-4">
 		  <div class="form-group">
@@ -200,6 +202,7 @@
 		</div>
 		</div>
 		<h3>経費申請書</h3>
+		<span id="helpBlock" class="help-block">次の項目はExcelシートへ直接記入してください・・・定期代以外の交通費、立替経費</span>
 		<h4>顧客請求経費・自社請求経費 定義</h4>
 		<div class="row">
 		<div class="col-sm-4">
@@ -543,7 +546,7 @@
 		<div class="row">
 		<div class="col-sm-12">
 		  <div class="form-group">
-		    <textarea class="form-control" id="textarea" name="借用物懸念事項" placeholder="懸念事項など"><?php $text = $config['借用物懸念事項'] == '' ? $text = $config['借用物懸念事項'] : $text = '懸念事項など' ; echo $text; ?></textarea>
+		    <textarea class="form-control" id="textarea" name="借用物懸念事項" placeholder="懸念事項など"><?php $text = $config['借用物懸念事項'] != '' ? $config['借用物懸念事項'] : '懸念事項など' ; echo $text; ?></textarea>
 		  </div>
 		</div>
 		</div>
