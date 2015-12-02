@@ -6,7 +6,7 @@ function saveConfigItem($client,$email,$config) {
 	$item['Email'] = array('S' => $email);
 	foreach ($config as $key => $value) {
 		if ($value != "") {
-			$item[$key] = array('S' => openssl_encrypt($value, 'AES-128-ECB', OpenSSL_ENCRYPT_KEY));
+			$item[$key] = array('S' => openssl_encrypt($value, OpenSSL_ENCRYPT_METHOD, OpenSSL_ENCRYPT_KEY));
 		}
 	}
 	try {

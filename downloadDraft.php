@@ -21,6 +21,5 @@ createDatafile($_POST);
 // フォーマット、データファイル、マクロファイルのzipアーカイブを作成する
 createZipArchive();
 
-// ファイルをブラウザからダウンロード
-$filepath = __DIR__.'/tmp/'.$_SESSION['email'].'/'.BRAND.'.zip';
-downloadFile($filepath);
+// ファイルをS3からダウンロード
+downloadFile();

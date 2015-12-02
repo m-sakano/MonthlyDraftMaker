@@ -27,7 +27,7 @@ function loadConfig() {
 	if (iterator_count($result) > 0) {
 		foreach ($result as $item) {
 			foreach ($names as $name) { 
-				$ret[$name] = openssl_decrypt($item[$name]['S'], 'AES-128-ECB', OpenSSL_ENCRYPT_KEY);
+				$ret[$name] = openssl_decrypt($item[$name]['S'], OpenSSL_ENCRYPT_METHOD, OpenSSL_ENCRYPT_KEY);
 			}
 		}
 	} else {
