@@ -15,7 +15,8 @@ function correctWorkTime($worktimes, $config) {
 		$d = date('d',$worktime['UnixTime']['N']);
 		$t = date('H:i',$worktime['UnixTime']['N']);
 		$a = $worktime['Attendance']['S'];
-		$w[] = array('date' => $d, 'time' => $t, 'attendance' => $a, 'description' => '');
+		$s = $worktime['Description']['S'];
+		$w[] = array('date' => $d, 'time' => $t, 'attendance' => $a, 'description' => $s);
 	}
 	/* 深夜残業判定と補正- 案件先勤務
 		退社時刻が始業時刻以前の場合（ e.g. 0:00〜9:00）、前日の深夜残業と判定
@@ -34,7 +35,7 @@ function correctWorkTime($worktimes, $config) {
 		if (($val['attendance'] == '案件先退社' || $val['attendance'] == '自社退社')
 				&& strtomin($val['time']) <= $startWorkTimeMin) {
 			$t = mintostr(strtomin($val['time']) + 24*60);
-			$w[$key] = array('date' => $val['date'] - 1, 'time' => $t, 'attendance' => $val['attendance'], 'description' => '');
+			$w[$key] = array('date' => $val['date'] - 1, 'time' => $t, 'attendance' => $val['attendance'], 'description' => $val['description']);
 		}
 	}
 	// 2回出社日のデータ補正と休憩時間 - 案件先勤務
@@ -68,7 +69,7 @@ function correctWorkTime($worktimes, $config) {
 			elseif ($is_ended[(int)$val['date']] == false && $val['attendance'] == '案件先退社') {
 				$endWorkTime1 = $val['time'];
 				$is_ended[(int)$val['date']] = true;
-				$key_to_del = $key; // 2回目の退社のときにレコードを削除
+				$key_to_del = $key; // 2回目の退社のときにレコードを削除する
 				/*
 					出社時刻 と 休憩開始時刻 の遅い方の時刻 から
 					退社時刻 と 休憩終了時刻 の早い方の時刻 まで
@@ -85,11 +86,19 @@ function correctWorkTime($worktimes, $config) {
 			// 2回目の出社
 			elseif ($is_started[(int)$val['date']] == true && $val['attendance'] == '案件先出社') {
 				$startWorkTime2 = $val['time'];
+				$descriptionStartWorkTime2 = $val['description'];
 				unset ($w[$key]);
 			}
 			// 2回目の退社
 			elseif ($is_ended[(int)$val['date']] == true && $val['attendance'] == '案件先退社') {
+				$descriptionEndWorkTime1 = $w[$key_to_del]['description'];
 				unset ($w[$key_to_del]);	// 1回目の退社のレコードを削除
+				// 2回目の退社のレコードに削除したレコードの備考を追加する
+				$s = '';
+				$s = $s == '' ? $s . $descriptionEndWorkTime1   : $s . "\n" . $descriptionEndWorkTime1;
+				$s = $s == '' ? $s . $descriptionStartWorkTime2 : $s . "\n" . $descriptionStartWorkTime2;
+				$s = $s == '' ? $s . $w[$key]['description']    : $s . "\n" . $w[$key]['description'];
+				$w[$key]['description'] = $s;
 				/* 退社時刻1 と 出社時刻2 の時間帯を休憩時間に繰り込み、descriptionに説明を記載する */
 				$endWorkTime2 = $val['time'];
 				$d = $val['date'];
@@ -175,11 +184,19 @@ function correctWorkTime($worktimes, $config) {
 			// 2回目の出社
 			elseif ($is_started[(int)$val['date']] == true && $val['attendance'] == '自社出社') {
 				$startWorkTime2 = $val['time'];
+				$descriptionStartWorkTime2 = $w[$key]['description'];
 				unset ($w[$key]);
 			}
 			// 2回目の退社
 			elseif ($is_ended[(int)$val['date']] == true && $val['attendance'] == '自社退社') {
+				$descriptionEndWorkTime1 = $w[$key_to_del]['description'];
 				unset ($w[$key_to_del]);	// 1回目の退社のレコードを削除
+				// 2回目の退社のレコードに削除したレコードの備考を追加する
+				$s = '';
+				$s = $s == '' ? $s . $descriptionEndWorkTime1   : $s . "\n" . $descriptionEndWorkTime1;
+				$s = $s == '' ? $s . $descriptionStartWorkTime2 : $s . "\n" . $descriptionStartWorkTime2;
+				$s = $s == '' ? $s . $w[$key]['description']    : $s . "\n" . $w[$key]['description'];
+				$w[$key]['description'] = $s;
 				/* 退社時刻1 と 出社時刻2 の時間帯を休憩時間に繰り込み、descriptionに説明を記載する */
 				$endWorkTime2 = $val['time'];
 				$d = $val['date'];
