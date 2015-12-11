@@ -105,8 +105,12 @@
 		<div class="col-sm-4">
 		  <div class="form-group">
 		    <label for="Team">班</label>
-		    <input type="text" class="form-control" id="Team" value="<?php echo $staffID['TEAM'] == '' ? '' : $staffID['TEAM'].'班';?>" disabled>
-		    <input type="hidden" name="班" value="<?php echo $staffID['TEAM'] == '' ? '' : $staffID['TEAM'].'班';?>">
+		    <input type="text" class="form-control" id="Team" value="<?php
+		    	echo ($staffID['TEAM'] == '' || $staffID['TEAM'] == '-') ? '' : $staffID['TEAM'].'班';
+		    ?>" disabled>
+		    <input type="hidden" name="班" value="<?php
+		    	echo ($staffID['TEAM'] == '' || $staffID['TEAM'] == '-') ? '' : $staffID['TEAM'].'班';
+		    ?>">
 		  </div>
 		</div>
 		</div>
