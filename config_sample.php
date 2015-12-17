@@ -32,13 +32,21 @@ define('DynamoDB_REGION', 'ap-northeast-1');
 define('AWS_ACCESS_KEY_ID','********');
 define('AWS_SECRET_ACCESS_KEY','********');
 define('OpenSSL_ENCRYPT_KEY','********');
+define('OpenSSL_ENCRYPT_METHOD','AES-256-ECB');
 
 // Monthly Report Setting
 define('EXCEL_TEMPLATE_FILE_NAME', '********.xlsx');
 define('EXCEL_MACRO_FILE_NAME', 'MonthlyDraftMaker.xlsm');
 define('EXCEL_DATA_FILE_NAME', 'data.xlsx');
 
+// PHP error reporting
 error_reporting(E_ALL &~E_NOTICE);
+//ini_set( 'display_errors', 1 );
 
 // Server Locale
 setlocale(LC_ALL, 'ja_JP.UTF-8');
+
+// timezone
+date_default_timezone_set('Asia/Tokyo');
+
+
