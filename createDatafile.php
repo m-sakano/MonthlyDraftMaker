@@ -7,6 +7,7 @@ require_once('strtomin.php');
 require_once('mintostr.php');
 require_once('correctWorkTime.php');
 require_once(__DIR__ . '/PHPExcel/Classes/PHPExcel/IOFactory.php');
+require_once('getCellText.php');
 
 function createDatafile($config) {
 	$userDirectory = __DIR__.'/tmp/'.$_SESSION['email'].'/';
@@ -57,7 +58,8 @@ function createDatafile($config) {
 	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 1, '案件先出社');
 	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(2, 1, '案件先退社');
 	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(3, 1, '案件先休憩時間');
-	
+	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(4, 1, '備考');
+
 	for ($row = 2 , $date = $thisMonthUnixTime; $date < $nextMonthUnixTime; $row++, $date += 60*60*24) {
 		$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, $row, date('Y/m/d',$date));
 	}
@@ -67,15 +69,34 @@ function createDatafile($config) {
 			case '案件先出社':
 				$row = (int)$val['date'] + 1;
 				$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, $row, $val['time']);
+				if ($val['description'] != '') {
+					$descriptionCell = $objPHPExcel->getActiveSheet()->getCellByColumnAndRow(4, $row);
+					$description = getCellText($descriptionCell);
+					if ($description == '') {
+						$description = $val['description'];
+					} else {
+						$description .= "\n" . $val['description'];
+					}
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(4, $row, $description);
+				}
 				break;
 			case '案件先退社':
 				$row = (int)$val['date'] + 1;
 				$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(2, $row, $val['time']);
+				if ($val['description'] != '') {
+					$descriptionCell = $objPHPExcel->getActiveSheet()->getCellByColumnAndRow(4, $row);
+					$description = getCellText($descriptionCell);
+					if ($description == '') {
+						$description = $val['description'];
+					} else {
+						$description .= "\n" . $val['description'];
+					}
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(4, $row, $description);
+				}
 				break;
 			case '案件先休憩時間':
 				$row = (int)$val['date'] + 1;
 				$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(3, $row, $val['time']);
-				$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(4, $row, $val['description']);
 			default:
 		}
 	}
@@ -86,6 +107,7 @@ function createDatafile($config) {
 	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, 1, '自社出社');
 	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(2, 1, '自社退社');
 	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(3, 1, '自社休憩時間');
+	$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(4, 1, '備考');
 	
 	for ($row = 2 , $date = $thisMonthUnixTime; $date < $nextMonthUnixTime; $row++, $date += 60*60*24) {
 		$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, $row, date('Y/m/d',$date));
@@ -96,15 +118,34 @@ function createDatafile($config) {
 			case '自社出社':
 				$row = (int)$val['date'] + 1;
 				$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, $row, $val['time']);
+				if ($val['description'] != '') {
+					$descriptionCell = $objPHPExcel->getActiveSheet()->getCellByColumnAndRow(4, $row);
+					$description = getCellText($descriptionCell);
+					if ($description == '') {
+						$description = $val['description'];
+					} else {
+						$description .= "\n" . $val['description'];
+					}
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(4, $row, $description);
+				}
 				break;
 			case '自社退社':
 				$row = (int)$val['date'] + 1;
 				$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(2, $row, $val['time']);
+				if ($val['description'] != '') {
+					$descriptionCell = $objPHPExcel->getActiveSheet()->getCellByColumnAndRow(4, $row);
+					$description = getCellText($descriptionCell);
+					if ($description == '') {
+						$description = $val['description'];
+					} else {
+						$description .= "\n" . $val['description'];
+					}
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(4, $row, $description);
+				}
 				break;
 			case '自社休憩時間':
 				$row = (int)$val['date'] + 1;
 				$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(3, $row, $val['time']);
-				$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(4, $row, $val['description']);
 			default:
 		}
 	}
