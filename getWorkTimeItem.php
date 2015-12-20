@@ -1,7 +1,6 @@
 <?php
 
 require_once('config.php');
-error_reporting(E_ALL);
 
 function getWorkTimeItem($client, $email=NULL, $unixTimeFrom=0, $unixTimeTo=0) {
 	try {

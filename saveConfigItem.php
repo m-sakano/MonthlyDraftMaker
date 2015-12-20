@@ -4,6 +4,7 @@ require_once('config.php');
 
 function saveConfigItem($client,$email,$config) {
 	$item['Email'] = array('S' => $email);
+	$item['AppsName'] = array('S' => BRAND);
 	foreach ($config as $key => $value) {
 		if ($value != "") {
 			$item[$key] = array('S' => openssl_encrypt($value, OpenSSL_ENCRYPT_METHOD, OpenSSL_ENCRYPT_KEY));

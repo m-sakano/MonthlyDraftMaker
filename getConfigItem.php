@@ -12,6 +12,12 @@ function getConfigItem($client,$email) {
 		                array('S' => $email)
 		            ),
 		            'ComparisonOperator' => 'EQ'
+		        ),
+		        'AppsName' => array(
+		            'AttributeValueList' => array(
+		                array('S' => BRAND)
+		            ),
+		            'ComparisonOperator' => 'EQ'
 		        )
 		    )
 		));
