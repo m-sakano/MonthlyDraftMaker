@@ -27,7 +27,7 @@ function createZipArchive() {
 	$zip = new ZipArchive();
 	$res = $zip->open($zippath, ZipArchive::CREATE) ;
 	if ($res === true) {
-	    $zip->addFromString(BRAND.'/data/'.EXCEL_TEMPLATE_FILE_NAME, $template['Body']);
+	    $zip->addFromString(BRAND.'/data/'.mb_convert_encoding(EXCEL_TEMPLATE_FILE_NAME,'CP932'), $template['Body']);
 	    $zip->addFromString(BRAND.'/'.EXCEL_MACRO_FILE_NAME,         $macro['Body']);
 	    $zip->addFile($userdir.EXCEL_DATA_FILE_NAME,     BRAND.'/data/'.EXCEL_DATA_FILE_NAME);
 	    $zip->close();
